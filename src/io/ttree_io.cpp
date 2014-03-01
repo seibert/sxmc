@@ -24,7 +24,12 @@ int read_float_vector_ttree(const std::string &filename,
   TFile* f;
   if (filename.compare(0, 1, ".") == 0) {
     char filePath[256];
-    getcwd(filePath, sizeof(filePath));
+    char *err = getcwd(filePath, sizeof(filePath));
+
+    if (err == NULL) {
+      return -1;
+    }
+
     printf("FILENAME: %s\n",
            (std::string(filePath)+filename.substr(1)).c_str());
     f = TFile::Open((std::string(filePath) + filename.substr(1)).c_str());
