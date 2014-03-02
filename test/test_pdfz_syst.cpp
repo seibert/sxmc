@@ -172,7 +172,9 @@ protected:
         samples[10] = 1.1; samples[11] = 0.7;
         samples[12] = -0.1; samples[13] = 0.7;
 
-        evaluator = new pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins);
+	weights.resize(samples.size(), 1);
+
+        evaluator = new pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins);
         eval_points.resize(6);
         eval_points[0] = -0.1;
         eval_points[1] = 0.0;

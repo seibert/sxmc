@@ -6,39 +6,38 @@
 #define isnan std::isnan
 #endif
 
-
 TEST_F(EvalHist2DConstructor, WrongSampleSize)
 {
-    ASSERT_THROW(pdfz::EvalHist(samples, 3 /* nfields */, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, 3 /* nfields */, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHist2DConstructor, NobsLargerThanNfields)
 {
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields , 7 /* nobservables */, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields , 7 /* nobservables */, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHist2DConstructor, WrongLowerSize)
 {
     lower.resize(1);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHist2DConstructor, WrongUpperSize)
 {
     upper.resize(1);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHist2DConstructor, WrongNbinsSize)
 {
     nbins.resize(1);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHist2DConstructor, ZeroBins)
 {
     nbins[1] = 0;
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 ///////////////
@@ -65,7 +64,6 @@ TEST_F(EvalHist2DMethods, Evaluation)
     ASSERT_FLOAT_EQ(3/norm, results[4]);
     ASSERT_TRUE(isnan(results[6]));
     ASSERT_TRUE(isnan(results[7]));
-    ASSERT_TRUE(isnan(results[8]));
 }
 
 TEST_F(EvalHist2DMethods, EvaluationOffsetStride)

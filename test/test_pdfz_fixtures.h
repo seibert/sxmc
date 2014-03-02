@@ -2,7 +2,7 @@
 #define __TEST_PDFZ_FIXTURES__
 
 #include <gtest/gtest.h>
-#include "pdfz.h"
+#include "sxmc/pdfz.h"
 
 class EvalHistConstructor : public ::testing::Test {
 protected:
@@ -18,6 +18,8 @@ protected:
     samples[5] = 1.1;
     samples[6] = -0.1;
 
+    weights.resize(samples.size(), 1);
+
     lower.resize(1);
     lower[0] = 0.0;
     upper.resize(1);
@@ -31,6 +33,7 @@ protected:
   int nobservables;
   int nfields;
   std::vector<float> samples;
+  std::vector<int> weights;
   std::vector<double> lower;
   std::vector<double> upper;
   std::vector<int> nbins;
@@ -40,7 +43,7 @@ class EvalHistMethods : public EvalHistConstructor {
 protected:
     virtual void SetUp() {
         EvalHistConstructor::SetUp();
-        evaluator = new pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins);
+        evaluator = new pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins);
         eval_points.resize(6);
         eval_points[0] = -0.1;
         eval_points[1] = 0.0;

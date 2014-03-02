@@ -41,36 +41,36 @@ TEST(SystematicObjects, ResolutionScaleSystematicConstructor)
 
 TEST_F(EvalHistConstructor, WrongSampleSize)
 {
-    ASSERT_THROW(pdfz::EvalHist(samples, 2 /* nfields */, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, 2 /* nfields */, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHistConstructor, NobsLargerThanNfields)
 {
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields , 7 /* nobservables */, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields , 7 /* nobservables */, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHistConstructor, WrongLowerSize)
 {
     lower.resize(2);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHistConstructor, WrongUpperSize)
 {
     upper.resize(2);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHistConstructor, WrongNbinsSize)
 {
     nbins.resize(2);
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 TEST_F(EvalHistConstructor, ZeroBins)
 {
     nbins[0] = 0;
-    ASSERT_THROW(pdfz::EvalHist(samples, nfields, nobservables, lower, upper, nbins), pdfz::Error);
+    ASSERT_THROW(pdfz::EvalHist(samples, weights, nfields, nobservables, lower, upper, nbins), pdfz::Error);
 }
 
 ///////////////

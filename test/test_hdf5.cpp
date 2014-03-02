@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
-#include "hdf5_io.h"
+#include "sxmc/hdf5_io.h"
+
+using namespace sxmc::io;
 
 TEST(HDF5IO, ReadWrite1D)
 {

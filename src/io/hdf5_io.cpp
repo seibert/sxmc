@@ -76,6 +76,10 @@ herr_t read_float_vector_hdf5(const std::string &filename,
         H5Fclose(file_id);
         return -1;
       }
+
+      if (rank[i] == 0)
+	rank[i] = dims[i];
+
       nelements *= dims[i];
     }
 

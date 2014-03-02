@@ -16,9 +16,12 @@ INCLUDE = -Iinclude -I$(RATROOT)/include -I$(ROOTSYS)/include -I$(RATROOT)/src/s
 CFLAGS = -DVERBOSE=true $(OPT_CFLAGS) $(INCLUDE)
 GCCFLAGS = -Wall -Werror -Wno-unused-variable -ftrapv -fdiagnostics-show-option  # -Wunused-variable errors with HEMI macros
 NOT_NVCC_CFLAGS =
-NVCCFLAGS = -gencode arch=compute_20,code=sm_20 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\" -use_fast_math $(OPT_NVCCFLAGS)
+NVCCFLAGS = -gencode arch=compute_20,code=sm_20 -gencode arch=compute_30,code=sm_30 -gencode arch=compute_35,code=\"sm_35,compute_35\" -gencode arch=compute_50,code=sm_50 -use_fast_math $(OPT_NVCCFLAGS)
 ROOTLIBS =  -lCore -lCint -lRIO -lMathCore -lHist -lGpad -lTree -lTree -lGraf -lm -lPhysics
-LFLAGS = -L$(RATROOT)/lib -lRATEvent_$(RATSYSTEM) -L$(ROOTSYS)/lib $(ROOTLIBS) -L/opt/local/lib -lhdf5 -lhdf5_hl
+LFLAGS = -L$(ROOTSYS)/lib $(ROOTLIBS) -L/opt/local/lib -lhdf5 -lhdf5_hl -pthread
+ifdef RATROOT
+LFLAGS += -L$(RATROOT)/lib -lRATEvent_$(RATSYSTEM)
+endif
 
 # Mac hacks!
 ARCH = $(shell uname)
@@ -42,9 +45,9 @@ CUDACC = $(CC) -x cu
 CC += --compiler-options "$(GCCFLAGS) -Wno-unused-function"
 endif
 
-OBJ_DIR = ./build
-SRCDIRS := $(subst ./src/,,$(dir $(shell find ./src -name '*.cpp' -print)))
-SRC := $(subst ./src/,,$(shell find ./src -name '*.cpp' -type f))
+OBJ_DIR = build
+SRCDIRS := $(subst src/,,$(dir $(shell find src -name '*.cpp' -print)))
+SRC := $(subst src/,,$(shell find src -name '*.cpp' -type f))
 SOURCES = $(filter-out mcmc.cpp nll_kernels.cpp pdfz.cpp, $(SRC))
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)
 JSONCPP_SOURCES = $(wildcard $(JSONCPP_SRC)/*.cpp)
@@ -58,7 +61,7 @@ TEST_OBJECTS = $(TEST_SOURCES:test/%.cpp=$(OBJ_DIR)/test/%.o)
 EXE = bin/sxmc
 
 ifndef RATROOT
-$(error RATROOT is not set)
+RATROOT=.
 endif
 
 ifndef ROOTSYS
@@ -83,7 +86,7 @@ build_dirs:
 	@$(foreach dir,$(SRCDIRS),mkdir -p build/$(dir))
 
 includes: include_dir
-	@find src -name *.h -type f -exec cp {} ./include/sxmc \;
+	@find src -name *.h -type f -exec cp -a {} include/sxmc \;
 
 include_dir:
 	@mkdir -p include/sxmc
@@ -91,7 +94,7 @@ include_dir:
 $(OBJ_DIR)/jsoncpp/%.o: $(JSONCPP_SRC)/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(OBJ_DIR)/%.o: ./src/%.cpp includes
+$(OBJ_DIR)/%.o: src/%.cpp includes
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 $(OBJ_DIR)/mcmc.o: src/mcmc.cpp includes
@@ -144,5 +147,6 @@ $(OBJ_DIR)/bench_sxmc.o: bench/bench_sxmc.cpp
 	$(CUDACC) -c -o $@ $< $(CFLAGS) -I$(GTEST_DIR)/include
 
 bin/bench_sxmc: $(OBJ_DIR)/bench_sxmc.o $(SXMC_NO_MAIN_FUNCTION_OBJECTS)
+	echo $(SXMC_NO_MAIN_FUNCTION_OBJECTS)
 	$(GCC) -o $@ $^ $(GCCFLAGS) $(LFLAGS) $(CUDA_LFLAGS)
 

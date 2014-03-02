@@ -4,7 +4,7 @@
 #include <TRandom.h>
 #include <TStopwatch.h>
 
-#include "pdfz.h"
+#include "sxmc/pdfz.h"
 
 #ifdef __CUDACC__
 #include <cuda_profiler_api.h>
@@ -54,9 +54,10 @@ void bench_pdfz()
     nbins_vec[0] = nbins;
 
     std::vector<float> samples(nsamples);
+    std::vector<int> weights(nsamples, 1);
     fill_gaussian(samples);
 
-    pdfz::EvalHist evaluator(samples, 1, 1, lower, upper, nbins_vec);
+    pdfz::EvalHist evaluator(samples, weights, 1, 1, lower, upper, nbins_vec);
 
     // Setup for evaluation
     vector<float> eval_points(neval_points);
@@ -118,35 +119,35 @@ void bench_pdfz_group()
 
     const int nsignals = 29;
     const int nsamples[nsignals] = { 
-        1e3 /* 0vbb */,
-        2e5 /* 2vbb */,
-        1e4 /* b8 */,
-        1e3 /* int_bi214 */,
-        1e3 /* int_tl208 */,
-        3e6 /* av_bi214 */,
-        5e5 /* av_tl208 */,
-        1e6 /* water_bi214 */,
-        8e4 /* water_tl208 */,
-        2e4 /* pmt_bg */,
-        1e3 /* Sc-44 */,
-        1e3 /* TI-44 */,
-        1e3 /* Ga-68 */,
-        1e3 /* Al-26 */,
-        1e3 /* Rb-82 */,
-        1e3 /* Sr-82 */,
-        1e3 /* Y-88  */,
-        1e3 /* K-42  */,
-        1e3 /* Ar-42 */,
-        1e3 /* Co-56 */,
-        1e3 /* Co-60 */,
-        1e3 /* Ag-110m */,
-        1e3 /* Rh-106 */,
-        1e3 /* Sn/Sb-126*/,
-        1e3 /* Sb-124 */,
-        1e3 /* Na-22 */,
-        1e3 /* Rb-84 */,
-        1e3 /* Sr-90 */,
-        1e3 /* Rh-102 */,
+        1000 /* 0vbb */,
+        200000 /* 2vbb */,
+        10000 /* b8 */,
+        1000 /* int_bi214 */,
+        1000 /* int_tl208 */,
+        3000000 /* av_bi214 */,
+        500000 /* av_tl208 */,
+        1000000 /* water_bi214 */,
+        80000 /* water_tl208 */,
+        20000 /* pmt_bg */,
+        1000 /* Sc-44 */,
+        1000 /* TI-44 */,
+        1000 /* Ga-68 */,
+        1000 /* Al-26 */,
+        1000 /* Rb-82 */,
+        1000 /* Sr-82 */,
+        1000 /* Y-88  */,
+        1000 /* K-42  */,
+        1000 /* Ar-42 */,
+        1000 /* Co-56 */,
+        1000 /* Co-60 */,
+        1000 /* Ag-110m */,
+        1000 /* Rh-106 */,
+        1000 /* Sn/Sb-126*/,
+        1000 /* Sb-124 */,
+        1000 /* Na-22 */,
+        1000 /* Rb-84 */,
+        1000 /* Sr-90 */,
+        1000 /* Rh-102 */,
     };
 
     // Banner
@@ -181,10 +182,13 @@ void bench_pdfz_group()
     // Initialize evaluators
     pdfz::EvalHist *evaluators[nsignals];
     std::vector<float> samples;
+
     for (int i = 0; i < nsignals; i++) {
         samples.resize(nsamples[i]);
+	std::vector<int> weights(samples.size(), 1);
+
         fill_gaussian(samples);
-        pdfz::EvalHist *evaluator = new pdfz::EvalHist(samples, 1, 1, lower, upper, nbins_vec);
+        pdfz::EvalHist *evaluator = new pdfz::EvalHist(samples, weights, 1, 1, lower, upper, nbins_vec);
 
         evaluator->SetEvalPoints(eval_points);
         evaluator->SetPDFValueBuffer(&pdf_values, neval_points * i);
